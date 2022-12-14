@@ -1,0 +1,373 @@
+package com.BikkadIT.SprigDataJpaFirstApp.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class User {
+
+	@Id
+	private int userId;
+	
+	private String userName;
+	
+	private String useraddress;
+	
+	private int userAge;
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getUseraddress() {
+		return useraddress;
+	}
+
+	public void setUseraddress(String useraddress) {
+		this.useraddress = useraddress;
+	}
+
+	public int getUserAge() {
+		return userAge;
+	}
+
+	public void setUserAge(int userAge) {
+		this.userAge = userAge;
+	}
+
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", userName=" + userName + ", useraddress=" + useraddress + ", userAge="
+				+ userAge + "]";
+	}
+}
+
+
+
+
+package com.BikkadIT.SprigDataJpaFirstApp.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import com.BikkadIT.SprigDataJpaFirstApp.model.User;
+@Repository
+public interface UserRepository extends JpaRepository<User, Integer>{
+
+	
+	public User findByUserAge(int userAge);
+	
+	public User findByUserName(String userName);
+	
+	public User findByUseraddress(String userAddress);
+}
+
+
+
+package com.BikkadIT.SprigDataJpaFirstApp.service;
+
+import java.util.List;
+
+import com.BikkadIT.SprigDataJpaFirstApp.model.User;
+
+public interface ServiceI {
+
+	public void saveUser(User user);
+	
+	public void saveAllUser(List<User> list);
+	
+	public User getUserById(Integer userId);
+	
+	public List<User> getAllId(List<Integer> list);
+	
+	public List<User> getAllUser();
+	
+	public boolean contactExists(Integer id);
+	
+	public long countRecords();
+	
+	public void delete(int id);
+	
+	public void deleteByObject(User user);
+	
+	public void deletellByIdContact(List<Integer> list);
+	
+	public void deleteALlContacts();
+	
+	public void UserPagination();
+	
+	
+	public void SortingUser();
+	
+	public User getContactByUserAge(int userAge);	
+	
+	public User getContactByUserName(String userName);	
+	
+
+	public User getContactByUserAddress(String userAddress);	
+	
+	
+	
+}
+
+
+
+package com.BikkadIT.SprigDataJpaFirstApp.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import com.BikkadIT.SprigDataJpaFirstApp.model.User;
+import com.BikkadIT.SprigDataJpaFirstApp.repository.UserRepository;
+
+@Service
+public class ServiceImpl implements ServiceI {
+	@Autowired
+	private UserRepository userRepository;
+
+	@Override
+	public void saveUser(User user) {
+
+		userRepository.save(user);
+	}
+
+	@Override
+	public void saveAllUser(List<User> list) {
+		Iterable<User> saveAll = userRepository.saveAll(list);
+
+	}
+
+	@Override
+	public User getUserById(Integer userId) {
+		User user = userRepository.findById(userId).get();
+		return user;
+	}
+
+	@Override
+	public List<User> getAllId(List<Integer> list) {
+		Iterable<User> findAllById = userRepository.findAllById(list);
+		return (List<User>) findAllById;
+	}
+
+	@Override
+	public List<User> getAllUser() {
+		List<User> findAll = (List<User>) userRepository.findAll();
+		return findAll;
+	}
+
+	@Override
+	public boolean contactExists(Integer id) {
+		boolean existsById = userRepository.existsById(id);
+		return existsById;
+	}
+
+	@Override
+	public long countRecords() {
+		long count = userRepository.count();
+		return count;
+	}
+
+	@Override
+	public void delete(int id) {
+		userRepository.deleteById(id);
+
+	}
+
+	@Override
+	public void deleteByObject(User user) {
+		userRepository.delete(user);
+
+	}
+
+	@Override
+	public void deletellByIdContact(List<Integer> list) {
+		userRepository.deleteAllById(list);
+
+	}
+
+	@Override
+	public void deleteALlContacts() {
+		userRepository.deleteAll();
+
+	}
+
+	@Override
+	public void UserPagination() {
+
+		PageRequest of = PageRequest.of(0, 5);
+
+		Page<User> findAll = userRepository.findAll(of);
+		System.out.println(findAll);
+		for (User u : findAll) {
+			System.out.println(u);
+		}
+
+	}
+
+	@Override
+	public void SortingUser() {
+		List<User> findAll = userRepository.findAll(Sort.by("userName").descending());
+
+		for (User u : findAll) {
+			System.out.println(u);
+		}
+	}
+
+	@Override
+	public User getContactByUserAge(int userAge) {
+
+		User user = userRepository.findByUserAge(userAge);
+
+		return user;
+	}
+
+	@Override
+	public User getContactByUserName(String userName) {
+
+		User user = userRepository.findByUserName(userName);
+		return user;
+	}
+
+	@Override
+	public User getContactByUserAddress(String userAddress) {
+		User useraddress2 = userRepository.findByUseraddress(userAddress);
+		return useraddress2;
+	}
+
+}
+
+
+
+package com.BikkadIT.SprigDataJpaFirstApp;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import com.BikkadIT.SprigDataJpaFirstApp.model.User;
+import com.BikkadIT.SprigDataJpaFirstApp.service.ServiceImpl;
+
+@SpringBootApplication
+public class SprigDataJpaFirstAppApplication {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context = SpringApplication.run(SprigDataJpaFirstAppApplication.class, args);
+
+		ServiceImpl bean = context.getBean(ServiceImpl.class);
+
+		// save() Method
+//		User user=new User();
+//		user.setUserId(3);
+//		user.setUserName("Kamesh");
+//		user.setUseraddress("Aurangabad");
+//		user.setUserAge(32);
+//		
+//		bean.saveUser(user);
+
+		// saveAll();
+
+//		User user=new User();
+//		user.setUserId(7);
+//		user.setUserName("dgkd");
+//		user.setUseraddress("Aurangabad");
+//		user.setUserAge(32);
+//		
+//		User user1=new User();
+//		user1.setUserId(8);
+//		user1.setUserName("kjfhgkjh");
+//		user1.setUseraddress("jgjg");
+//		user1.setUserAge(32);
+//		
+//		
+//		User user2=new User();
+//		user2.setUserId(9);
+//		user2.setUserName("kdjhd");
+//		user2.setUseraddress("dggj");
+//		user2.setUserAge(32);
+//		
+//		List l=new ArrayList();
+//		l.add(user);
+//		l.add(user1);
+//		l.add(user2);
+//		
+//		bean.saveAllUser(l);
+//	
+
+//		User user = bean.getUserById(1);
+//		System.out.println(user);
+//		
+
+//		List<Integer> asList = Arrays.asList(1,3,5);
+//		List<User> allId = bean.getAllId(asList);
+//		System.out.println(allId);
+//		
+//		for(User usr:allId) {
+//			System.out.println(usr);
+//		}
+
+//		List<User> allUser = bean.getAllUser();
+//		System.out.println(allUser);
+//		
+//		for(User usr:allUser) {
+//			System.out.println(usr);
+//		}
+
+//		boolean contactExists = bean.contactExists(23);
+//		System.out.println(contactExists);
+//		
+//		long countRecords = bean.countRecords();
+//		System.out.println(countRecords);
+//		
+		// bean.delete(6);
+
+//		User user=new User();
+//		   user.setUserId(5);
+//		bean.deleteByObject(user);
+//		
+
+//		List<Integer> asList = Arrays.asList(3,4);
+//		bean.deletellByIdContact(asList);
+//	
+
+		// bean.deleteALlContacts();
+
+		// bean.UserPagination();
+
+		// bean.SortingUser();
+
+//		User user = bean.getContactByUserAge(35);
+//		System.out.println(user);
+		
+//		User user = bean.getContactByUserName("kdjhd");
+//		System.out.println(user);
+//		
+		
+		
+		User contactByUserAddress = bean.getContactByUserAddress("jgjgtyh");
+  System.out.println(contactByUserAddress);
+	}
+
+}
